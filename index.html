@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buffalo Homes — Free Home Valuation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0d1b2a;
+      --navy-mid: #152233;
+      --navy-light: #1e3045;
+      --gold: #c9a84c;
+      --gold-light: #e2c47a;
+      --gold-dim: rgba(201,168,76,0.15);
+      --white: #f5f0e8;
+      --muted: rgba(245,240,232,0.55);
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--navy);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Subtle background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(201,168,76,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* Header */
+    .brand {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeDown 0.6s ease both;
+    }
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--white);
+    }
+    .brand-sub {
+      font-size: 0.75rem;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 4px;
+    }
+
+    /* Gold divider line */
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: var(--gold);
+      margin: 16px auto 0;
+      opacity: 0.6;
+    }
+
+    /* Card */
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--navy-mid);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      padding: 44px 40px 40px;
+      animation: fadeUp 0.7s ease 0.1s both;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 2px;
+      padding: 4px 10px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 20px;
+    }
+    .card-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    .card h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+    .card h1 span { color: var(--gold); }
+
+    .card-desc {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* Form */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .form-group:last-of-type { margin-bottom: 0; }
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+    }
+
+    input {
+      background: var(--navy-light);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 3px;
+      padding: 12px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    input::placeholder { color: rgba(245,240,232,0.3); }
+    input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+    }
+    input.error { border-color: #e05c5c; }
+
+    .error-msg {
+      font-size: 0.75rem;
+      color: #e87878;
+      margin-top: 4px;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: 24px;
+      padding: 15px 24px;
+      background: var(--gold);
+      border: none;
+      border-radius: 3px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--navy);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .submit-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .submit-btn .btn-text { transition: opacity 0.2s; }
+    .submit-btn .btn-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .submit-btn.loading .btn-text { opacity: 0; }
+    .submit-btn.loading .btn-loading { opacity: 1; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(13,27,42,0.3);
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .trust-line {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 14px;
+      letter-spacing: 0.02em;
+    }
+    .trust-line svg {
+      vertical-align: middle;
+      margin-right: 4px;
+      opacity: 0.6;
+    }
+
+    /* What you get section */
+    .perks {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(201,168,76,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .perk {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .perk-icon {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      background: var(--gold-dim);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .perk-icon svg { width: 10px; height: 10px; }
+
+    /* Success state */
+    .success-overlay {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .success-overlay.visible { display: block; }
+    .success-icon {
+      width: 56px; height: 56px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .success-icon svg { width: 24px; height: 24px; stroke: var(--gold); }
+    .success-overlay h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    .success-overlay p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .success-btn {
+      display: inline-block;
+      padding: 13px 32px;
+      background: var(--gold);
+      color: var(--navy);
+      border-radius: 3px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: background 0.2s;
+    }
+    .success-btn:hover { background: var(--gold-light); }
+
+    .form-content { transition: opacity 0.3s; }
+    .form-content.hidden { opacity: 0; pointer-events: none; height: 0; overflow: hidden; }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      font-size: 0.72rem;
+      color: rgba(245,240,232,0.3);
+      text-align: center;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+
+    /* Animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 32px 24px 28px; }
+      .form-row { grid-template-columns: 1fr; }
+      .card h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="brand">
+      <div class="brand-name">Buffalo Homes</div>
+      <div class="brand-sub">Western New York Real Estate</div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="card">
+
+      <div class="form-content" id="formContent">
+        <div class="card-badge">Free Instant Valuation</div>
+        <h1>What's Your Home <span>Worth?</span></h1>
+        <p class="card-desc">Get an instant estimate powered by NYS property records and federal market data. Enter your details below to access the tool — takes 30 seconds.</p>
+
+        <form id="gateForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" placeholder="Jane" autocomplete="given-name" />
+              <span class="error-msg" id="firstNameError">Please enter your first name.</span>
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" placeholder="Smith" autocomplete="family-name" />
+              <span class="error-msg" id="lastNameError">Please enter your last name.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="jane@example.com" autocomplete="email" />
+            <span class="error-msg" id="emailError">Please enter a valid email address.</span>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-text">Get My Home's Value →</span>
+            <span class="btn-loading"><span class="spinner"></span></span>
+          </button>
+        </form>
+
+        <p class="trust-line">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          No spam. Your info is never sold or shared.
+        </p>
+
+        <div class="perks">
+          <div class="perk">
+            <div class="perk-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            Instant estimate based on NYS property records
+          </div>
+          <div class="perk">
+            <div class="perk-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            Neighborhood analysis & local market trends
+          </div>
+          <div class="perk">
+            <div class="perk-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            100% free — no obligation, no agent pressure
+          </div>
+        </div>
+      </div>
+
+      <div class="success-overlay" id="successOverlay">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>You're all set!</h2>
+        <p>Taking you to the valuation tool now…</p>
+        <a href="valuation.html" class="success-btn" id="continueBtn">Open Valuation Tool →</a>
+      </div>
+
+    </div>
+
+    <div class="footer">© 2026 Buffalo Homes · Western New York Real Estate</div>
+
+  </div>
+
+  <script>
+    // ── CONFIG ──────────────────────────────────────────────────────────────
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmxddXAjJjwnaG6ZHrsvvqx0OX1IEMZR-L704fV_9rAUKn4T1jo3rIOPHVx8T9QWnB1w/exec';
+    // ────────────────────────────────────────────────────────────────────────
+
+    const BLOCKED_DOMAINS = ['mailinator.com','guerrillamail.com','tempmail.com','throwam.com','yopmail.com','trashmail.com','sharklasers.com','guerrillamailblock.com','grr.la','spam4.me','10minutemail.com','dispostable.com'];
+
+    // If already registered, go straight to the tool
+    if (localStorage.getItem('bh_registered') === 'true') {
+      window.location.replace('valuation.html');
+    }
+
+    const form       = document.getElementById('gateForm');
+    const submitBtn  = document.getElementById('submitBtn');
+    const firstNameEl = document.getElementById('firstName');
+    const lastNameEl  = document.getElementById('lastName');
+    const emailEl     = document.getElementById('email');
+
+    function showError(inputEl, msgEl, show) {
+      inputEl.classList.toggle('error', show);
+      msgEl.classList.toggle('visible', show);
+    }
+
+    function validateEmail(email) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'format';
+      const domain = email.split('@')[1].toLowerCase();
+      if (BLOCKED_DOMAINS.includes(domain)) return 'blocked';
+      return 'ok';
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const firstName = firstNameEl.value.trim();
+      const lastName  = lastNameEl.value.trim();
+      const email     = emailEl.value.trim();
+
+      let valid = true;
+
+      if (!firstName) {
+        showError(firstNameEl, document.getElementById('firstNameError'), true); valid = false;
+      } else {
+        showError(firstNameEl, document.getElementById('firstNameError'), false);
+      }
+
+      if (!lastName) {
+        showError(lastNameEl, document.getElementById('lastNameError'), true); valid = false;
+      } else {
+        showError(lastNameEl, document.getElementById('lastNameError'), false);
+      }
+
+      const emailStatus = validateEmail(email);
+      const emailErrEl  = document.getElementById('emailError');
+      if (emailStatus === 'format') {
+        emailErrEl.textContent = 'Please enter a valid email address.';
+        showError(emailEl, emailErrEl, true); valid = false;
+      } else if (emailStatus === 'blocked') {
+        emailErrEl.textContent = 'Please use a real email address.';
+        showError(emailEl, emailErrEl, true); valid = false;
+      } else {
+        showError(emailEl, emailErrEl, false);
+      }
+
+      if (!valid) return;
+
+      // Save to localStorage
+      const leadData = { firstName, lastName, email, timestamp: new Date().toISOString() };
+      localStorage.setItem('bh_lead', JSON.stringify(leadData));
+      localStorage.setItem('bh_registered', 'true');
+
+      // Show loading
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      // Send to Google Sheet (fire-and-forget — don't block UX on failure)
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            timestamp: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
+            firstName,
+            lastName,
+            email,
+            status: 'Gate Only',
+            source: 'Valuation Tool'
+          })
+        });
+      } catch (err) {
+        // Silent fail — lead is saved locally, don't block the user
+        console.warn('Sheet sync failed:', err);
+      }
+
+      // Show success
+      submitBtn.classList.remove('loading');
+      document.getElementById('formContent').classList.add('hidden');
+      document.getElementById('successOverlay').classList.add('visible');
+
+      // Auto-redirect after 2s
+      setTimeout(() => { window.location.href = 'valuation.html'; }, 2000);
+    });
+
+    // Clear errors on input
+    [firstNameEl, lastNameEl, emailEl].forEach(el => {
+      el.addEventListener('input', () => {
+        el.classList.remove('error');
+        el.nextElementSibling && el.nextElementSibling.classList.remove('visible');
+      });
+    });
+  </script>
+</body>
+</html>
