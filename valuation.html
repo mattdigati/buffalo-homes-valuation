@@ -469,6 +469,44 @@ async function runValuation(){
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('valuateBtn').disabled)runValuation();});
+(function() {
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmxddXAjJjwnaG6ZHrsvvqx0OX1IEMZR-L704fV_9rAUKn4T1jo3rIOPHVx8T9QWnB1w/exec';
+
+  const _orig = window.runValuation;
+  window.runValuation = function() {
+    if (_orig) _orig.apply(this, arguments);
+
+    setTimeout(function() {
+      const lead = JSON.parse(localStorage.getItem('bh_lead') || '{}');
+      const estEl = document.querySelector('.result-value, .estimate-value, [class*="value"]');
+      const confEl = document.querySelector('.confidence-value, [class*="confidence"]');
+
+      const payload = {
+        timestamp:       new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
+        firstName:       lead.firstName || '',
+        lastName:        lead.lastName  || '',
+        email:           lead.email     || '',
+        propertyAddress: (document.getElementById('address')   || {}).value || '',
+        zipCode:         (document.getElementById('zip')       || {}).value || '',
+        sqft:            (document.getElementById('sqft')      || {}).value || '',
+        bedrooms:        (document.getElementById('beds')      || {}).value || '',
+        bathrooms:       (document.getElementById('baths')     || {}).value || '',
+        yearBuilt:       (document.getElementById('yearBuilt') || {}).value || '',
+        condition:       (document.getElementById('condition') || {}).value || '',
+        estimatedValue:  estEl  ? estEl.textContent.trim()  : '',
+        status:          'Valuation Run',
+        source:          'Valuation Tool'
+      };
+
+      fetch(SCRIPT_URL, {
+        method:  'POST',
+        mode:    'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body:    JSON.stringify(payload)
+      }).catch(function(err) { console.warn('Sheet sync failed:', err); });
+    }, 2000);
+  };
+})();
 </script>
 </body>
 </html>
